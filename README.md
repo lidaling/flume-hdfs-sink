@@ -1,22 +1,27 @@
-### hdfs sink add impala table data loading logic.
+# hdfs sink add impala table data loading logic.
 
-- add more jar dependencies:
+### add more jar dependencies:
 	
+	```
 	cd $FLUME_HOME/lib
 	wget http://central.maven.org/maven2/org/apache/hive/hive-jdbc/1.2.1/hive-jdbc-1.2.1.jar
 	wget http://central.maven.org/maven2/org/apache/hive/hive-service/1.2.1/hive-service-1.2.1.jar
 	wget http://central.maven.org/maven2/org/apache/hive/hive-common/1.2.1/hive-common-1.2.1.jar
 	wget http://central.maven.org/maven2/org/apache/hive/hive-metastore/1.2.1/hive-metastore-1.2.1.jar
+	```
 
-- update jar dependencies:
+### update jar dependencies:
 
+```
 	cd $FLUME_HOME/lib
 	rm httpcore*.jar httpclient*.jar
 	wget http://central.maven.org/maven2/org/apache/httpcomponents/httpcore/4.3/httpcore-4.3.jar
 	wget http://central.maven.org/maven2/org/apache/httpcomponents/httpclient/4.3/httpclient-4.3.jar
+```
 
-- config example:
+### config example:
 
+```
 	agtest.sources =rudpl
 	agtest.sinks =hdfs-sink
 	agtest.channels =cudpl
@@ -41,10 +46,14 @@
 
 	agtest.sources.rudpl.channels = cudpl
 	agtest.sinks.hdfs-sink.channel = cudpl
+```
 
-- start flume-ng
+### start flume-ng
 
+
+```
 	bin/flume-ng agent -c conf -f conf/flume-conf.properties -name agtest &
+```
 
 
     

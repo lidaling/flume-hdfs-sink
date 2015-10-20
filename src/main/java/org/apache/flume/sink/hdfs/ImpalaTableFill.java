@@ -30,12 +30,16 @@ public class ImpalaTableFill {
     private String tableLocation;
     private String tableName;
     private String impalaUrl;
+    public Boolean workable=true;
     private static final Logger LOG = LoggerFactory.getLogger(ImpalaTableFill.class);
 
     public ImpalaTableFill(String tableName, String tableLocation, String impalaUrl) {
         this.tableLocation = tableLocation;
         this.tableName = tableName;
         this.impalaUrl = impalaUrl;
+        if("".equals(tableName)||"".equals(tableLocation)||"".equals(impalaUrl)){
+            workable=false;
+        }
     }
 
     public void impalaTableFillData(String hdfsPath) {

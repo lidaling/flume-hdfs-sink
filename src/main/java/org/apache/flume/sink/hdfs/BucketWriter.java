@@ -637,7 +637,9 @@ class BucketWriter {
           LOG.info("Renaming " + srcPath + " to " + dstPath);
           renameTries.incrementAndGet();
           fs.rename(srcPath, dstPath); // could block
-          impalaTableFill.impalaTableFillData(dstPath.toString());
+          if(impalaTableFill.workable){
+            impalaTableFill.impalaTableFillData(dstPath.toString());
+          }
         }
         return null;
       }

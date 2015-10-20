@@ -2,13 +2,13 @@
 
 ### add more jar dependencies:
 	
-	```
+```
 	cd $FLUME_HOME/lib
 	wget http://central.maven.org/maven2/org/apache/hive/hive-jdbc/1.2.1/hive-jdbc-1.2.1.jar
 	wget http://central.maven.org/maven2/org/apache/hive/hive-service/1.2.1/hive-service-1.2.1.jar
 	wget http://central.maven.org/maven2/org/apache/hive/hive-common/1.2.1/hive-common-1.2.1.jar
 	wget http://central.maven.org/maven2/org/apache/hive/hive-metastore/1.2.1/hive-metastore-1.2.1.jar
-	```
+```
 
 ### update jar dependencies:
 

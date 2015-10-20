@@ -212,9 +212,9 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
     maxOpenFiles = context.getInteger("hdfs.maxOpenFiles", defaultMaxOpenFiles);
     callTimeout = context.getLong("hdfs.callTimeout", defaultCallTimeout);
 
-    tableName=context.getString("tableName");
-    tableLocation =context.getString("tableLocation");
-    impalaUrl=context.getString("impalaUrl");
+    tableName=context.getString("tableName")==null?"":context.getString("tableName");
+    tableLocation =context.getString("tableLocation")==null?"":context.getString("tableLocation");
+    impalaUrl=context.getString("impalaUrl")==null?"":context.getString("impalaUrl");
 
     threadsPoolSize = context.getInteger("hdfs.threadsPoolSize",
         defaultThreadPoolSize);

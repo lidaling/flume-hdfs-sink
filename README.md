@@ -18,6 +18,8 @@
  */
 ```
 
+This modify release can load data to parquet table
+
 # hdfs sink add impala table data loading logic.
 
 ### add more jar dependencies:
@@ -54,11 +56,12 @@
 	agtest.sinks.hdfs-sink.hdfs.path = hdfs://cdh-master:8020/tmp/test1
 	agtest.sinks.hdfs-sink.hdfs.fileType = DataStream
 	agtest.sinks.hdfs-sink.hdfs.batchSize = 3
-	# custom hdfs-impala configure
-	agtest.sinks.hdfs-sink.tableLocation=/impala/tbs/test1
-	agtest.sinks.hdfs-sink.tableName=default.test1
-	agtest.sinks.hdfs-sink.impalaUrl=jdbc:hive2://192.168.0.94:21050/;auth=noSasl
 
+	# custom hdfs-impala configure
+    agtest.sinks.hdfs-sink.partitionFormat=yyyyMMddHH
+  	agtest.sinks.hdfs-sink.tableTxtLocation=/impala/tbs/test1_txt
+  	agtest.sinks.hdfs-sink.tableName=default.test1,default.test1_txt
+  	agtest.sinks.hdfs-sink.impalaUrl=jdbc:hive2://192.168.0.94:21050/;auth=noSasl
 
 	agtest.channels.cudpl.type = memory
 	agtest.channels.cudpl.capacity = 1000

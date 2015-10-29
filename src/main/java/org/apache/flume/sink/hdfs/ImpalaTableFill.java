@@ -34,17 +34,15 @@ public class ImpalaTableFill {
     private String impalaUrl;
     private String tableName_parquet;
     private String tableName_text;
-    private String tableTxtLocation;
     public Boolean workable=true;
     private String partitionFormat;
     private static String columns;
     private static final Logger LOG = LoggerFactory.getLogger(ImpalaTableFill.class);
 
-    public ImpalaTableFill(String tableName, String tableTxtLocation, String impalaUrl,String partitionFormat) {
-        this.tableTxtLocation = tableTxtLocation;
+    public ImpalaTableFill(String tableName,  String impalaUrl,String partitionFormat) {
         this.impalaUrl = impalaUrl;
         this.partitionFormat=partitionFormat;
-        if("".equals(tableName)||"".equals(tableTxtLocation)||"".equals(impalaUrl)){
+        if("".equals(tableName)||"".equals(impalaUrl)||"".equals(partitionFormat)){
             workable=false;
         }else {
             this.tableName_parquet=tableName.split(",")[0];
@@ -230,9 +228,7 @@ public class ImpalaTableFill {
         Statement stmt = null;
         ResultSet rs = null;
         this.setPartition();
-        boolean result = false;
         StringBuffer sbf=null;
-        String columnStr="";
         try {
             stmt = con.createStatement();
             rs = stmt.executeQuery("SHOW COLUMN STATS " + tableName);

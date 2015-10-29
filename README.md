@@ -59,7 +59,6 @@ This modify release can load data to parquet table
 
 	# custom hdfs-impala configure
     agtest.sinks.hdfs-sink.partitionFormat=yyyyMMddHH
-  	agtest.sinks.hdfs-sink.tableTxtLocation=/impala/tbs/test1_txt
   	agtest.sinks.hdfs-sink.tableName=default.test1,default.test1_txt
   	agtest.sinks.hdfs-sink.impalaUrl=jdbc:hive2://192.168.0.94:21050/;auth=noSasl
 

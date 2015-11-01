@@ -50,23 +50,24 @@ public class ImpalaTableFill {
             LOG.debug("check impala workable :yes");
             LOG.debug("tablenames check:"+this.tableName_parquet);
             LOG.debug("tablenames check:"+this.tableName_text);
+            this.setPartitionStr();
+            // make the columns str
+            if(StringUtils.isBlank(columns)){
+                columns=this.getColumnStr(this.tableName_text);
+            }
         }
     }
 
     public void impalaTableFillData(String hdfsPath) {
-        // make the columns str
-        if(StringUtils.isBlank(columns)){
-            columns=this.getColumnStr(this.tableName_text);
-        }
         /**
-         * check partition exists ,if not create one and load data
-         * else load data only
+         * check parquetdb table partition exists ,if not create one and load data
+         * else load data into txtdb table only
          *
         */
-        if(!this.checkNowPartitionExsits(this.tableName_text)) {
+        if(!this.checkPartitionExsits(this.tableName_text, this.nowPartition)) {
             this.createPartition(this.tableName_text);
             this.execTxtTableDataLoad(hdfsPath);
-            if(!this.checkNowPartitionExsits(this.tableName_parquet)) {
+            if(!this.checkPartitionExsits(this.tableName_parquet, this.nowPartition)) {
                 this.createPartition(this.tableName_parquet);
                 TimeStage timeStage=getTimeStage(this.nowPartition);
                 this.execParquetTableDataFill(timeStage.start,timeStage.end);
@@ -94,6 +95,7 @@ public class ImpalaTableFill {
     }
 
     public void execParquetTableDataFill(long start,long end){
+        //todo check target partition exists
         Connection con = this.getConnection();
         Statement stmt = null;
         String sql = "insert overwrite "+this.tableName_parquet+" partition (dat= \'"+this.lastPartition+"\') select "+columns+" from "+this.tableName_text+
@@ -113,7 +115,29 @@ public class ImpalaTableFill {
             }
 
         }
+        // remove txtdb lastpartition
+        this.removePartition(this.tableName_text,this.lastPartition);
 
+    }
+
+    private void removePartition(String tableName, String partition) {
+        Connection con = this.getConnection();
+        Statement stmt = null;
+        String sql = "alter table "+tableName+" drop partition(dat='"+partition+"')";
+        LOG.debug("exec sql :"+sql);
+        try {
+            stmt = con.createStatement();
+            stmt.executeUpdate(sql);
+        } catch (SQLException var14) {
+            LOG.error(var14.getMessage());
+        } finally {
+            try {
+                this.closeResource(con, stmt, (ResultSet)null);
+            } catch (SQLException var13) {
+                LOG.error(var13.getMessage());
+            }
+
+        }
     }
 
     private void execTxtTableDataLoad(String hdfsPath) {
@@ -185,11 +209,10 @@ public class ImpalaTableFill {
         }
     }
 
-    private boolean checkNowPartitionExsits(String tableName) {
+    private boolean checkPartitionExsits(String tableName,String partitionName) {
         Connection con = this.getConnection();
         Statement stmt = null;
         ResultSet rs = null;
-        this.setPartition();
         boolean result = false;
         try {
             stmt = con.createStatement();
@@ -197,7 +220,7 @@ public class ImpalaTableFill {
 
             while(rs.next()) {
                 LOG.debug("rs.getString(1):"+rs.getString(1));
-                if(rs.getString(1) .equals( this.nowPartition)) {
+                if(rs.getString(1) .equals( partitionName)) {
                     result = true;
                     break;
                 }
@@ -215,7 +238,7 @@ public class ImpalaTableFill {
         return result;
     }
 
-    private void setPartition() {
+    private void setPartitionStr() {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(this.partitionFormat);
         this.nowPartition = simpleDateFormat.format(calendar.getTime());
@@ -227,7 +250,6 @@ public class ImpalaTableFill {
         Connection con = this.getConnection();
         Statement stmt = null;
         ResultSet rs = null;
-        this.setPartition();
         StringBuffer sbf=null;
         try {
             stmt = con.createStatement();

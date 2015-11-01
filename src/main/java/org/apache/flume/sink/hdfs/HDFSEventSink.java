@@ -139,7 +139,7 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
   private int tryCount;
   private PrivilegedExecutor privExecutor;
 
-  private String tableName,impalaUrl,partitionFormat;
+  private String tableName,impalaUrl,partitionFormat,refCtimeColumn;
 
 
   /*
@@ -215,6 +215,7 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
     tableName=context.getString("tableName")==null?"":context.getString("tableName");
     impalaUrl=context.getString("impalaUrl")==null?"":context.getString("impalaUrl");
     partitionFormat=context.getString("partitionFormat")==null?"":context.getString("partitionFormat");
+    refCtimeColumn=context.getString("refCtimeColumn")==null?"":context.getString("refCtimeColumn");
 
     threadsPoolSize = context.getInteger("hdfs.threadsPoolSize",
         defaultThreadPoolSize);
@@ -483,7 +484,7 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
       suffix, codeC, compType, hdfsWriter, timedRollerPool,
       privExecutor, sinkCounter, idleTimeout, closeCallback,
       lookupPath, callTimeout, callTimeoutPool, retryInterval,
-      tryCount,tableName,impalaUrl, partitionFormat);
+      tryCount,tableName,impalaUrl, partitionFormat,refCtimeColumn);
     if(mockFs != null) {
       bucketWriter.setFileSystem(mockFs);
       bucketWriter.setMockStream(mockWriter);

@@ -111,7 +111,7 @@ class BucketWriter {
   private final long retryInterval;
   private final int maxRenameTries;
 
-  private String tableName,impalaUrl,partitionFormat;
+  private String tableName,impalaUrl,partitionFormat,refCtimeColumn;
 
   // flag that the bucket writer was closed due to idling and thus shouldn't be
   // reopened. Not ideal, but avoids internals of owners
@@ -126,7 +126,7 @@ class BucketWriter {
     SinkCounter sinkCounter, int idleTimeout, WriterCallback onCloseCallback,
     String onCloseCallbackPath, long callTimeout,
     ExecutorService callTimeoutPool, long retryInterval,
-    int maxCloseTries,String tableName,String impalaUrl,String partitionFormat) {
+    int maxCloseTries,String tableName,String impalaUrl,String partitionFormat,String refCtimeColumn) {
     this.rollInterval = rollInterval;
     this.rollSize = rollSize;
     this.rollCount = rollCount;
@@ -157,6 +157,7 @@ class BucketWriter {
     this.tableName=tableName;
     this.impalaUrl=impalaUrl;
     this.partitionFormat=partitionFormat;
+    this.refCtimeColumn=refCtimeColumn;
 
     this.writer.configure(context);
   }
@@ -628,7 +629,7 @@ class BucketWriter {
 
     final Path srcPath = new Path(bucketPath);
     final Path dstPath = new Path(targetPath);
-    final ImpalaTableFill impalaTableFill=new ImpalaTableFill(tableName,impalaUrl,partitionFormat);
+    final ImpalaTableFill impalaTableFill=new ImpalaTableFill(tableName,impalaUrl,partitionFormat,refCtimeColumn);
 
     callWithTimeout(new CallRunner<Void>() {
       @Override

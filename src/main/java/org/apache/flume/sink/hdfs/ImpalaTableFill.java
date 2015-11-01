@@ -36,17 +36,19 @@ public class ImpalaTableFill {
     private String tableName_text;
     public Boolean workable=true;
     private String partitionFormat;
+    private String refCtimeColumn;
     private static String columns;
     private static final Logger LOG = LoggerFactory.getLogger(ImpalaTableFill.class);
 
-    public ImpalaTableFill(String tableName,  String impalaUrl,String partitionFormat) {
+    public ImpalaTableFill(String tableName,  String impalaUrl,String partitionFormat,String refCtimeColumn) {
         this.impalaUrl = impalaUrl;
         this.partitionFormat=partitionFormat;
-        if("".equals(tableName)||"".equals(impalaUrl)||"".equals(partitionFormat)){
+        if("".equals(tableName)||"".equals(impalaUrl)||"".equals(partitionFormat)||"".equals(refCtimeColumn)){
             workable=false;
         }else {
             this.tableName_parquet=tableName.split(",")[0];
             this.tableName_text=tableName.split(",")[1];
+            this.refCtimeColumn=refCtimeColumn;
             LOG.debug("check impala workable :yes");
             LOG.debug("tablenames check:"+this.tableName_parquet);
             LOG.debug("tablenames check:"+this.tableName_text);
@@ -100,7 +102,7 @@ public class ImpalaTableFill {
         Statement stmt = null;
         String sql = "insert overwrite "+this.tableName_parquet+" partition (dat= \'"+this.lastPartition+"\') select "+columns+" from "+this.tableName_text+
                 " where (dat =\'"+this.nowPartition+"\' or dat = \'" +this.lastPartition+
-                "\') and createTime >=" +start +" and createTime <"+end;
+                "\') and "+this.refCtimeColumn+" >=" +start +" and "+this.refCtimeColumn+" <"+end;
         LOG.debug("exec sql :"+sql);
         try {
             stmt = con.createStatement();

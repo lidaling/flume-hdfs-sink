@@ -19,12 +19,7 @@
 package org.apache.flume.sink.hdfs;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,6 +27,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.gson.*;
+import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.flume.Channel;
 import org.apache.flume.Clock;
 import org.apache.flume.Context;
@@ -51,6 +48,8 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,7 +138,8 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
   private int tryCount;
   private PrivilegedExecutor privExecutor;
 
-  private String tableName,impalaUrl,partitionFormat,refCtimeColumn;
+  private String tableName,impalaUrl,partitionFormat,refCtimeColumn,format,fieldsSeq;
+  private Map<String,String> fieldsSeqConf=(Map<String,String>)new ListOrderedMap();
 
 
   /*
@@ -195,7 +195,7 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
     this.context = context;
 
     filePath = Preconditions.checkNotNull(
-        context.getString("hdfs.path"), "hdfs.path is required");
+            context.getString("hdfs.path"), "hdfs.path is required");
     fileName = context.getString("hdfs.filePrefix", defaultFileName);
     this.suffix = context.getString("hdfs.fileSuffix", defaultSuffix);
     inUsePrefix = context.getString("hdfs.inUsePrefix", defaultInUsePrefix);
@@ -213,9 +213,22 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
     callTimeout = context.getLong("hdfs.callTimeout", defaultCallTimeout);
 
     tableName=context.getString("tableName")==null?"":context.getString("tableName");
+    fieldsSeq=context.getString("fieldsSeq")==null?"":context.getString("fieldsSeq");
     impalaUrl=context.getString("impalaUrl")==null?"":context.getString("impalaUrl");
     partitionFormat=context.getString("partitionFormat")==null?"":context.getString("partitionFormat");
     refCtimeColumn=context.getString("refCtimeColumn")==null?"":context.getString("refCtimeColumn");
+    format=context.getString("format")==null?"":context.getString("format");
+
+    LOG.debug("custom fieldsSeq:"+fieldsSeq);
+    LOG.debug("custom format:"+format);
+    if(!"".equals(fieldsSeq)){
+      String[] stringFiledsArray=fieldsSeq.split(",");
+      String[] filedArray=new String[2];
+      for(String field:stringFiledsArray){
+        filedArray=field.split(":");
+        fieldsSeqConf.put(filedArray[0],filedArray[1]);
+      }
+    }
 
     threadsPoolSize = context.getInteger("hdfs.threadsPoolSize",
         defaultThreadPoolSize);
@@ -423,6 +436,7 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
 
         // Write the data to HDFS
         try {
+          handleEvent(event);
           bucketWriter.append(event);
         } catch (BucketClosedException ex) {
           LOG.info("Bucket was closed while trying to append, " +
@@ -433,6 +447,7 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
           synchronized (sfWritersLock) {
             sfWriters.put(lookupPath, bucketWriter);
           }
+          handleEvent(event);
           bucketWriter.append(event);
         }
       }
@@ -472,6 +487,43 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
       }
     } finally {
       transaction.close();
+    }
+  }
+
+  private void handleEvent(Event event) {
+    LOG.debug("in handleEvent");
+    if("json".equals(this.format)){
+      try {
+        if(fieldsSeqConf.size()>0){
+          String eventBodyStr=new String(event.getBody());
+          String[] bodyStrArray=eventBodyStr.split("\t");
+          String dfrom=bodyStrArray[0];
+          LOG.debug("got body string is:"+bodyStrArray[1]);
+          JsonElement jelement = new JsonParser().parse(bodyStrArray[1]);
+          JsonObject obj= jelement.getAsJsonObject();
+
+          StringBuffer sbf=new StringBuffer(dfrom);
+          for(Entry<String,String> entry:fieldsSeqConf.entrySet()){
+              sbf.append("\t");
+            try {
+              if("string".equals(entry.getValue())){
+                sbf.append(obj.get(entry.getKey()).getAsString());
+              }else if("bigint".equals(entry.getValue())){
+                sbf.append(obj.get(entry.getKey()).getAsBigInteger());
+              }
+            } catch (Exception e) {
+              sbf.append("");
+            }
+          }
+          LOG.debug("original event body str is :"+eventBodyStr);
+          eventBodyStr=sbf.toString();
+          LOG.debug("final event body str is :"+eventBodyStr);
+          event.setBody(eventBodyStr.getBytes());
+        }
+      } catch (Exception e) {
+        LOG.error("json body parse failed.check the config please");
+      }
+
     }
   }
 

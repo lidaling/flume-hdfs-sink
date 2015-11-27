@@ -113,6 +113,8 @@ class BucketWriter {
 
   private String tableName,impalaUrl,partitionFormat,refCtimeColumn;
 
+  private ImpalaTableFill impalaTableFill;
+
   // flag that the bucket writer was closed due to idling and thus shouldn't be
   // reopened. Not ideal, but avoids internals of owners
   protected boolean closed = false;
@@ -158,6 +160,8 @@ class BucketWriter {
     this.impalaUrl=impalaUrl;
     this.partitionFormat=partitionFormat;
     this.refCtimeColumn=refCtimeColumn;
+
+    this.impalaTableFill=new ImpalaTableFill(this.tableName,this.impalaUrl,this.partitionFormat,this.refCtimeColumn);
 
     this.writer.configure(context);
   }
@@ -629,7 +633,6 @@ class BucketWriter {
 
     final Path srcPath = new Path(bucketPath);
     final Path dstPath = new Path(targetPath);
-    final ImpalaTableFill impalaTableFill=new ImpalaTableFill(tableName,impalaUrl,partitionFormat,refCtimeColumn);
 
     callWithTimeout(new CallRunner<Void>() {
       @Override

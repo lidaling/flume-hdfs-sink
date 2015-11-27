@@ -66,6 +66,7 @@ public class ImpalaTableFill {
          * else load data into txtdb table only
          *
         */
+        LOG.debug("get hdfsPath:"+hdfsPath);
         if(!this.checkPartitionExsits(this.tableName_text, this.nowPartition)) {
             this.createPartition(this.tableName_text);
             this.execTxtTableDataLoad(hdfsPath);
@@ -90,7 +91,7 @@ public class ImpalaTableFill {
             setLastTime(calendarStart);
             timestage.start=calendarStart.getTimeInMillis();
         } catch (ParseException e) {
-            LOG.error(e.getMessage());
+            LOG.error("impalaTableFillError:"+e.getMessage());
         }
         LOG.debug("time range:" + timestage.toString());
         return timestage;
@@ -108,12 +109,12 @@ public class ImpalaTableFill {
             stmt = con.createStatement();
             stmt.executeUpdate(sql);
         } catch (SQLException var14) {
-            LOG.error(var14.getMessage());
+            LOG.error("impalaTableFillError:"+var14.getMessage());
         } finally {
             try {
                 this.closeResource(con, stmt, (ResultSet)null);
             } catch (SQLException var13) {
-                LOG.error(var13.getMessage());
+                LOG.error("impalaTableFillError:"+var13.getMessage());
             }
 
         }
@@ -131,12 +132,12 @@ public class ImpalaTableFill {
             stmt = con.createStatement();
             stmt.executeUpdate(sql);
         } catch (SQLException var14) {
-            LOG.error(var14.getMessage());
+            LOG.error("impalaTableFillError:"+var14.getMessage());
         } finally {
             try {
                 this.closeResource(con, stmt, (ResultSet)null);
             } catch (SQLException var13) {
-                LOG.error(var13.getMessage());
+                LOG.error("impalaTableFillError:"+var13.getMessage());
             }
 
         }
@@ -151,12 +152,12 @@ public class ImpalaTableFill {
             stmt = con.createStatement();
             stmt.executeUpdate(sql);
         } catch (SQLException var14) {
-            LOG.error(var14.getMessage());
+            LOG.error("impalaTableFillError:"+var14.getMessage());
         } finally {
             try {
                 this.closeResource(con, stmt, (ResultSet)null);
             } catch (SQLException var13) {
-                LOG.error(var13.getMessage());
+                LOG.error("impalaTableFillError:"+var13.getMessage());
             }
 
         }
@@ -171,9 +172,9 @@ public class ImpalaTableFill {
             con = DriverManager.getConnection(this.impalaUrl);
             LOG.debug("impalaurl:" + this.impalaUrl);
         } catch (ClassNotFoundException var3) {
-            LOG.error(var3.toString());
+            LOG.error("impalaTableFillError:"+var3.toString());
         } catch (SQLException var4) {
-            LOG.error(var4.toString());
+            LOG.error("impalaTableFillError:"+var4.toString());
         }
 
         return con;
@@ -199,14 +200,16 @@ public class ImpalaTableFill {
         Statement stmt = null;
         try {
             stmt = con.createStatement();
-            stmt.executeUpdate("alter table " + tableName + " add partition(dat =\'" + this.nowPartition + "\')");
+            String sql="alter table " + tableName + " add partition(dat =\'" + this.nowPartition + "\')";
+            LOG.debug("exec sql:"+sql);
+            stmt.executeUpdate(sql);
         } catch (SQLException var13) {
-            LOG.error(var13.getMessage());
+            LOG.error("impalaTableFillError:"+var13.getMessage());
         } finally {
             try {
                 this.closeResource(con, stmt, (ResultSet)null);
             } catch (SQLException var12) {
-                LOG.error(var12.getMessage());
+                LOG.error("impalaTableFillError:"+var12.getMessage());
             }
         }
     }
@@ -228,12 +231,12 @@ public class ImpalaTableFill {
                 }
             }
         } catch (SQLException var14) {
-            LOG.error(var14.getMessage());
+            LOG.error("impalaTableFillError:"+var14.getMessage());
         } finally {
             try {
                 this.closeResource(con, stmt, rs);
             } catch (SQLException var13) {
-                LOG.error(var13.getMessage());
+                LOG.error("impalaTableFillError:"+var13.getMessage());
             }
 
         }
@@ -265,12 +268,12 @@ public class ImpalaTableFill {
                 }
             }
         } catch (SQLException var14) {
-            LOG.error(var14.getMessage());
+            LOG.error("impalaTableFillError:"+var14.getMessage());
         } finally {
             try {
                 this.closeResource(con, stmt, rs);
             } catch (SQLException var13) {
-                LOG.error(var13.getMessage());
+                LOG.error("impalaTableFillError:"+var13.getMessage());
             }
 
         }

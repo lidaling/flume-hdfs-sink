@@ -97,7 +97,6 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
   private static final int defaultThreadPoolSize = 10;
   private static final int defaultRollTimerPoolSize = 1;
 
-
   private final HDFSWriterFactory writerFactory;
   private WriterLinkedHashMap sfWriters;
 
@@ -505,15 +504,18 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
           StringBuffer sbf=new StringBuffer(dfrom);
           for(Entry<String,String> entry:fieldsSeqConf.entrySet()){
               sbf.append("\t");
+              sbf.append(obj.get(entry.getKey()).getAsString());
+            /**
             try {
               if("string".equals(entry.getValue())){
                 sbf.append(obj.get(entry.getKey()).getAsString());
               }else if("bigint".equals(entry.getValue())){
-                sbf.append(obj.get(entry.getKey()).getAsBigInteger());
+                sbf.append(obj.get(entry.getKey()).getAsLong());
               }
             } catch (Exception e) {
               sbf.append("");
             }
+             */
           }
           LOG.debug("original event body str is :"+eventBodyStr);
           eventBodyStr=sbf.toString();

@@ -32,13 +32,26 @@ public class TestGson {
     public static void main(String[] args) throws JSONException {
         //log_time:long,hos_id:string,log_type:string,user_mac:string,supp_id:string
         Map<String,String> tableFieldsConf=(Map<String,String>)new ListOrderedMap();
+        /**
+         suppId:string,logTime:bigint,url:string;userAgent:string
+         */
 
-        tableFieldsConf.put("log_type","string");
-        tableFieldsConf.put("supp_id","string");
-        tableFieldsConf.put("hos_id","string");
-        tableFieldsConf.put("log_time","string");
-        tableFieldsConf.put("user_mac","string");
-        String eventBodyStr="portal\t{\"log_time\":1111,\"hos_id\":222,\"log_type\":\"4\",\"user_mac\":\"dd:dfsfsdfsdfs\",\"supp_id\":\"3\"}";
+        tableFieldsConf.put("follow","string");
+        tableFieldsConf.put("loginVersion","string");
+        tableFieldsConf.put("arriveVersion","string");
+        tableFieldsConf.put("hosIdarriveVersion","string");
+        tableFieldsConf.put("appIdarriveVersion","string");
+        tableFieldsConf.put("weixinWifiShopid","string");
+        tableFieldsConf.put("weixinWifiBssid","string");
+        tableFieldsConf.put("originId","string");
+        tableFieldsConf.put("weixinWifiSsid","string");
+        tableFieldsConf.put("openId","string");
+        tableFieldsConf.put("gwId","string");
+        tableFieldsConf.put("suppId","string");
+        tableFieldsConf.put("logTime","string");
+        tableFieldsConf.put("url","string");
+        tableFieldsConf.put("userAgent","string");
+        String eventBodyStr="portal\t{\"appId\":\"wxac0f449b34ef6062\",\"arriveVersion\":\"portal_v3_qs\",\"follow\":1,\"gwId\":\"61060300FF0C4781\",\"hosId\":816,\"logId\":34690,\"logTime\":1448855497366,\"loginVersion\":\"v1.1\",\"openId\":\"oMv7YsjCVwe5B3TSNNw26mGSUOxQ\",\"originId\":\"oMv7YsjCVwe5B3TSNNw26mGSUOxQ\",\"suppId\":5,\"url\":\"http://hoswifi.bblink.cn/snappy/pre_arrive.html?p_=v1.1$portal_v3_qs$816$wxac0f449b34ef6062$5$61060300FF0C4781&weixin_wifi_shopId=0&weixin_wifi_bssid=94:b4:0f:bf:3d:42&originid=oMv7YsjCVwe5B3TSNNw26mGSUOxQ&weixin_wifi_ssid=@Hos-WiFi&openId=oMv7YsjCVwe5B3TSNNw26mGSUOxQ\",\"userAgent\":\"Mozilla/5.0 (Linux; U; Android 4.4.2; zh-cn; PE-TL00M Build/HuaweiPE-TL00M) AppleWebKit/533.1 (KHTML, like Gecko)Version/4.0 MQQBrowser/5.4 TBS/025478 Mobile Safari/533.1 MicroMessenger/6.3.7.51_rbb7fa12.660 NetType/WIFI Language/zh_CN\",\"weixinWifiBssid\":\"94:b4:0f:bf:3d:42\",\"weixinWifiShopid\":\"0\",\"weixinWifiSsid\":\"@Hos-WiFi\"}";
         String[] bodyStrArray=eventBodyStr.split("\t");
         String dfrom=bodyStrArray[0];
 
@@ -49,7 +62,14 @@ public class TestGson {
         for(Map.Entry<String,String> entry:tableFieldsConf.entrySet()){
             sbf.append("\t");
             if("string".equals(entry.getValue())){
-                sbf.append(obj.get(entry.getKey()).getAsString());
+                System.out.println(entry.getKey());
+                if(null==obj.get(entry.getKey())){
+                    sbf.append("");
+                }else if(obj.get(entry.getKey()).isJsonNull()){
+                    sbf.append("");
+                }else {
+                    sbf.append(obj.get(entry.getKey()).getAsString());
+                }
             }else if("bigint".equals(entry.getValue())){
                 sbf.append(obj.get(entry.getKey()).getAsBigInteger());
             }

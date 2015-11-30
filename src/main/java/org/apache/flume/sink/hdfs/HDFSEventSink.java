@@ -492,9 +492,11 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
   private void handleEvent(Event event) {
     LOG.debug("in handleEvent");
     if("json".equals(this.format)){
+      String eventBodyStr=null;
+      String key=null;
       try {
         if(fieldsSeqConf.size()>0){
-          String eventBodyStr=new String(event.getBody());
+          eventBodyStr=new String(event.getBody());
           String[] bodyStrArray=eventBodyStr.split("\t");
           String dfrom=bodyStrArray[0];
           LOG.debug("got body string is:"+bodyStrArray[1]);
@@ -504,7 +506,14 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
           StringBuffer sbf=new StringBuffer(dfrom);
           for(Entry<String,String> entry:fieldsSeqConf.entrySet()){
               sbf.append("\t");
-              sbf.append(obj.get(entry.getKey()).getAsString());
+              key=entry.getKey();
+              if(null==obj.get(key)){
+                sbf.append("");
+              }else if(obj.get(key).isJsonNull()){
+                sbf.append("");
+              }else{
+                sbf.append(obj.get(key).getAsString());
+              }
             /**
             try {
               if("string".equals(entry.getValue())){
@@ -523,7 +532,10 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
           event.setBody(eventBodyStr.getBytes());
         }
       } catch (Exception e) {
-        LOG.error("json body parse failed.check the config please");
+        LOG.error("json body parse failed str is:"+eventBodyStr);
+        LOG.error("json body parse failed key is:"+key);
+        LOG.error("tablename is:"+tableName);
+        LOG.error("json parse error",e);
       }
 
     }

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.flume.sink.hdfs;
+package org.apache.flume.sink.hdfs.add;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -250,6 +250,7 @@ public class ImpalaTableFill {
         Calendar calendarLast= (Calendar) calendar.clone();
         setLastTime(calendarLast);
         this.lastPartition=simpleDateFormat.format(calendarLast.getTime());
+        LOG.debug("now partition:"+this.nowPartition+",last partition:"+this.lastPartition);
     }
     private String getColumnStr(String tableName){
         Connection con = this.getConnection();

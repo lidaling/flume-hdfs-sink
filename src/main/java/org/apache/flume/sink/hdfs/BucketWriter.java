@@ -41,6 +41,7 @@ import org.apache.flume.SystemClock;
 import org.apache.flume.auth.PrivilegedExecutor;
 import org.apache.flume.instrumentation.SinkCounter;
 import org.apache.flume.sink.hdfs.HDFSEventSink.WriterCallback;
+import org.apache.flume.sink.hdfs.add.ImpalaTableFill;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;

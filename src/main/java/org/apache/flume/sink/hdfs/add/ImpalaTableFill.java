@@ -38,11 +38,13 @@ public class ImpalaTableFill {
     private String partitionFormat;
     private String refCtimeColumn;
     private static String columns;
+    private Boolean refCtimeColumnEnable;
     private static final Logger LOG = LoggerFactory.getLogger(ImpalaTableFill.class);
 
-    public ImpalaTableFill(String tableName,  String impalaUrl,String partitionFormat,String refCtimeColumn) {
+    public ImpalaTableFill(String tableName,  String impalaUrl,String partitionFormat,String refCtimeColumn,Boolean refCtimeColumnEnable) {
         this.impalaUrl = impalaUrl;
         this.partitionFormat=partitionFormat;
+        this.refCtimeColumnEnable=refCtimeColumnEnable;
         if("".equals(tableName)||"".equals(impalaUrl)||"".equals(partitionFormat)||"".equals(refCtimeColumn)){
             workable=false;
         }else {
@@ -66,7 +68,7 @@ public class ImpalaTableFill {
          * else load data into txtdb table only
          *
         */
-        LOG.debug("get hdfsPath:"+hdfsPath);
+        LOG.debug("get hdfsPath:" + hdfsPath);
         if(!this.checkPartitionExsits(this.tableName_text, this.nowPartition)) {
             this.createPartition(this.tableName_text);
             this.execTxtTableDataLoad(hdfsPath);
@@ -101,9 +103,14 @@ public class ImpalaTableFill {
         //todo check target partition exists
         Connection con = this.getConnection();
         Statement stmt = null;
-        String sql = "insert overwrite "+this.tableName_parquet+" partition (dat= \'"+this.lastPartition+"\') select "+columns+" from "+this.tableName_text+
-                " where (dat =\'"+this.nowPartition+"\' or dat = \'" +this.lastPartition+
-                "\') and "+this.refCtimeColumn+" >=" +start +" and "+this.refCtimeColumn+" <"+end;
+        StringBuffer sqlBuffer =new StringBuffer("insert overwrite "+this.tableName_parquet+" partition (dat= \'"+this.lastPartition+"\') select "+columns+" from "+this.tableName_text);
+        if(refCtimeColumnEnable){
+            sqlBuffer.append(" where (dat =\'"+this.nowPartition+"\' or dat = \'" +this.lastPartition+ "\') and "+this.refCtimeColumn+" >=" +start +" and "+this.refCtimeColumn+" <"+end);
+        }else {
+            sqlBuffer.append(" where dat = \'" +this.lastPartition+ "\' ");
+        }
+
+        String sql=sqlBuffer.toString();
         LOG.debug("exec sql :"+sql);
         try {
             stmt = con.createStatement();

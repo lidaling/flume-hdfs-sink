@@ -60,6 +60,7 @@ This modify release can load data to parquet table
 	# custom hdfs-impala configure
     agtest.sinks.hdfs-sink.partitionFormat=yyyyMMddHH
     agtest.sinks.hdfs-sink.refCtimeColumn=createtime
+    agtest.sinks.hdfs-sink.refCtimeColumnEnable=false
   	agtest.sinks.hdfs-sink.tableName=default.test1,default.test1_txt
   	agtest.sinks.hdfs-sink.tableFields=dfrom:string,id:string,comment:string
   	agtest.sinks.hdfs-sink.format=json

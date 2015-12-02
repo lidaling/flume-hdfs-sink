@@ -138,6 +138,7 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
   private PrivilegedExecutor privExecutor;
 
   private String tableName,impalaUrl,partitionFormat,refCtimeColumn,format,fieldsSeq;
+  private Boolean refCtimeColumnEnable;
   private Map<String,String> fieldsSeqConf=(Map<String,String>)new ListOrderedMap();
 
 
@@ -217,6 +218,7 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
     partitionFormat=context.getString("partitionFormat")==null?"":context.getString("partitionFormat");
     refCtimeColumn=context.getString("refCtimeColumn")==null?"":context.getString("refCtimeColumn");
     format=context.getString("format")==null?"":context.getString("format");
+    refCtimeColumnEnable=context.getBoolean("refCtimeColumnEnable")==null?false:context.getBoolean("refCtimeColumnEnable");
 
     LOG.debug("custom fieldsSeq:"+fieldsSeq);
     LOG.debug("custom format:"+format);
@@ -550,7 +552,7 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
       suffix, codeC, compType, hdfsWriter, timedRollerPool,
       privExecutor, sinkCounter, idleTimeout, closeCallback,
       lookupPath, callTimeout, callTimeoutPool, retryInterval,
-      tryCount,tableName,impalaUrl, partitionFormat,refCtimeColumn);
+      tryCount,tableName,impalaUrl, partitionFormat,refCtimeColumn,refCtimeColumnEnable);
     if(mockFs != null) {
       bucketWriter.setFileSystem(mockFs);
       bucketWriter.setMockStream(mockWriter);

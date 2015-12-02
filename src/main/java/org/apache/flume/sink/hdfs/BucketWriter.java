@@ -113,6 +113,7 @@ class BucketWriter {
   private final int maxRenameTries;
 
   private String tableName,impalaUrl,partitionFormat,refCtimeColumn;
+  private Boolean refCtimeColumnEnable;
 
   private ImpalaTableFill impalaTableFill;
 
@@ -129,7 +130,7 @@ class BucketWriter {
     SinkCounter sinkCounter, int idleTimeout, WriterCallback onCloseCallback,
     String onCloseCallbackPath, long callTimeout,
     ExecutorService callTimeoutPool, long retryInterval,
-    int maxCloseTries,String tableName,String impalaUrl,String partitionFormat,String refCtimeColumn) {
+    int maxCloseTries,String tableName,String impalaUrl,String partitionFormat,String refCtimeColumn,Boolean refCtimeColumnEnable) {
     this.rollInterval = rollInterval;
     this.rollSize = rollSize;
     this.rollCount = rollCount;
@@ -161,8 +162,9 @@ class BucketWriter {
     this.impalaUrl=impalaUrl;
     this.partitionFormat=partitionFormat;
     this.refCtimeColumn=refCtimeColumn;
+    this.refCtimeColumnEnable=refCtimeColumnEnable;
 
-    this.impalaTableFill=new ImpalaTableFill(this.tableName,this.impalaUrl,this.partitionFormat,this.refCtimeColumn);
+    this.impalaTableFill=new ImpalaTableFill(this.tableName,this.impalaUrl,this.partitionFormat,this.refCtimeColumn,this.refCtimeColumnEnable);
 
     this.writer.configure(context);
   }

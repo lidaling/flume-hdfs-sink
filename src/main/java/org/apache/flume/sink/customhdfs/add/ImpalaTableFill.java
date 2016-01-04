@@ -37,7 +37,7 @@ public class ImpalaTableFill {
     public Boolean workable=true;
     private String partitionFormat;
     private String refCtimeColumn;
-    private static String columns;
+    private String columns;
     private Boolean refCtimeColumnEnable;
     private static final Logger LOG = LoggerFactory.getLogger(ImpalaTableFill.class);
 
@@ -56,9 +56,7 @@ public class ImpalaTableFill {
             LOG.debug("tablenames check:"+this.tableName_text);
             this.setPartitionStr();
             // make the columns str
-            if(StringUtils.isBlank(columns)){
-                columns=this.getColumnStr(this.tableName_text);
-            }
+            columns=this.getColumnStr(this.tableName_text);
         }
     }
 

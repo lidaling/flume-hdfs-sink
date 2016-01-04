@@ -497,9 +497,16 @@ public class HDFSEventSink extends AbstractSink implements Configurable {
         if(fieldsSeqConf.size()>0){
           eventBodyStr=new String(event.getBody());
           String[] bodyStrArray=eventBodyStr.split("\t");
-          String dfrom=bodyStrArray[0];
-          LOG.debug("got body string is:"+bodyStrArray[1]);
-          JsonElement jelement = new JsonParser().parse(bodyStrArray[1]);
+          String dfrom="";
+          String bodyStr=null;
+          if(bodyStrArray.length==2){
+            dfrom=bodyStrArray[0];
+            bodyStr=bodyStrArray[1];
+          }else{
+            bodyStr=bodyStrArray[0];
+          }
+          LOG.debug("got body string is:"+bodyStr);
+          JsonElement jelement = new JsonParser().parse(bodyStr);
           JsonObject obj= jelement.getAsJsonObject();
 
           StringBuffer sbf=new StringBuffer(dfrom);

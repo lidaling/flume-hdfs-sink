@@ -36,6 +36,15 @@ limitations under the License.
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
       </plugin>
+       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <!--specify jar name-->
+          <finalName>flume-customhdfs-sink-1.6.0</finalName>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
@@ -120,23 +129,23 @@ limitations under the License.
         <maven.test.skip>true</maven.test.skip>
       </properties>
     </profile>
-<!--
-    <profile>
-      <id>hadoop-1.0</id>
-      <activation>
-        <property>
-          <name>flume.hadoop.profile</name>
-          <value>1</value>
-        </property>
-      </activation>
-      <dependencies>
+    <!--
+        <profile>
+          <id>hadoop-1.0</id>
+          <activation>
+            <property>
+              <name>flume.hadoop.profile</name>
+              <value>1</value>
+            </property>
+          </activation>
+          <dependencies>
 
-        <dependency>
-          <groupId>org.apache.hadoop</groupId>
-          <artifactId>hadoop-test</artifactId>
-          <scope>test</scope>
-        </dependency>
--->
+            <dependency>
+              <groupId>org.apache.hadoop</groupId>
+              <artifactId>hadoop-test</artifactId>
+              <scope>test</scope>
+            </dependency>
+    -->
         <!-- required because the hadoop-core pom is missing these deps
             and MiniDFSCluster pulls in the webhdfs classes -->
     <!--

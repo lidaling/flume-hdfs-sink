@@ -51,9 +51,9 @@ public class ImpalaTableFill {
             this.tableName_parquet=tableName.split(",")[0];
             this.tableName_text=tableName.split(",")[1];
             this.refCtimeColumn=refCtimeColumn;
-            LOG.debug("check impala workable :yes");
-            LOG.debug("tablenames check:"+this.tableName_parquet);
-            LOG.debug("tablenames check:"+this.tableName_text);
+            LOG.info("check impala workable :yes");
+            LOG.info("tablenames check:"+this.tableName_parquet);
+            LOG.info("tablenames check:"+this.tableName_text);
             this.setPartitionStr();
             // make the columns str
             columns=this.getColumnStr(this.tableName_text);
@@ -66,7 +66,7 @@ public class ImpalaTableFill {
          * else load data into txtdb table only
          *
         */
-        LOG.debug("get hdfsPath:" + hdfsPath);
+        LOG.info("get hdfsPath:" + hdfsPath);
         if(!this.checkPartitionExsits(this.tableName_text, this.nowPartition)) {
             this.createPartition(this.tableName_text);
             this.execTxtTableDataLoad(hdfsPath);
@@ -93,7 +93,7 @@ public class ImpalaTableFill {
         } catch (ParseException e) {
             LOG.error("impalaTableFillError:"+e.getMessage());
         }
-        LOG.debug("time range:" + timestage.toString());
+        LOG.info("time range:" + timestage.toString());
         return timestage;
     }
 
@@ -109,7 +109,7 @@ public class ImpalaTableFill {
         }
 
         String sql=sqlBuffer.toString();
-        LOG.debug("exec sql :"+sql);
+        LOG.info("exec sql :"+sql);
         try {
             stmt = con.createStatement();
             stmt.executeUpdate(sql);
@@ -132,7 +132,7 @@ public class ImpalaTableFill {
         Connection con = this.getConnection();
         Statement stmt = null;
         String sql = "alter table "+tableName+" drop partition(dat='"+partition+"')";
-        LOG.debug("exec sql :"+sql);
+        LOG.info("exec sql :"+sql);
         try {
             stmt = con.createStatement();
             stmt.executeUpdate(sql);
@@ -152,7 +152,7 @@ public class ImpalaTableFill {
         Connection con = this.getConnection();
         Statement stmt = null;
         String sql = "load data inpath '" + hdfsPath + "' into table " + this.tableName_text + " partition(dat = \'" + this.nowPartition + "\');";
-        LOG.debug("exec sql :"+sql);
+        LOG.info("exec sql :"+sql);
         try {
             stmt = con.createStatement();
             stmt.executeUpdate(sql);
@@ -175,7 +175,7 @@ public class ImpalaTableFill {
         try {
             Class.forName("org.apache.hive.jdbc.HiveDriver");
             con = DriverManager.getConnection(this.impalaUrl);
-            LOG.debug("impalaurl:" + this.impalaUrl);
+            LOG.info("impalaurl:" + this.impalaUrl);
         } catch (ClassNotFoundException var3) {
             LOG.error("impalaTableFillError:"+var3.toString());
         } catch (SQLException var4) {
@@ -206,7 +206,7 @@ public class ImpalaTableFill {
         try {
             stmt = con.createStatement();
             String sql="alter table " + tableName + " add partition(dat =\'" + this.nowPartition + "\')";
-            LOG.debug("exec sql:"+sql);
+            LOG.info("exec sql:"+sql);
             stmt.executeUpdate(sql);
         } catch (SQLException var13) {
             LOG.error("impalaTableFillError:"+var13.getMessage());
@@ -229,7 +229,7 @@ public class ImpalaTableFill {
             rs = stmt.executeQuery("show partitions " + tableName);
 
             while(rs.next()) {
-                LOG.debug("rs.getString(1):"+rs.getString(1));
+                LOG.info("rs.getString(1):"+rs.getString(1));
                 if(rs.getString(1) .equals( partitionName)) {
                     result = true;
                     break;
@@ -255,7 +255,7 @@ public class ImpalaTableFill {
         Calendar calendarLast= (Calendar) calendar.clone();
         setLastTime(calendarLast);
         this.lastPartition=simpleDateFormat.format(calendarLast.getTime());
-        LOG.debug("now partition:"+this.nowPartition+",last partition:"+this.lastPartition);
+        LOG.info("now partition:"+this.nowPartition+",last partition:"+this.lastPartition);
     }
     private String getColumnStr(String tableName){
         Connection con = this.getConnection();
@@ -267,7 +267,7 @@ public class ImpalaTableFill {
             rs = stmt.executeQuery("SHOW COLUMN STATS " + tableName);
             sbf=new StringBuffer();
             while(rs.next()) {
-                LOG.debug("rs.getString(1):"+rs.getString(1));
+                LOG.info("rs.getString(1):"+rs.getString(1));
                 if(!"dat".equals(rs.getString(1))){
                     sbf.append(",");
                     sbf.append(rs.getString(1));
